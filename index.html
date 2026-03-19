@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trade Journal Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="theme-color" content="#0f172a">
+</head>
+<body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <h1 class="mobile-title">📊 TradeJournal</h1>
+        <div class="mobile-stats">
+            <span id="mobile-winrate">0%</span>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <h2>📊 TradeJournal</h2>
+                </div>
+                <button class="close-sidebar" id="closeSidebar">×</button>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-view="dashboard">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Dashboard</span>
+                </button>
+                <button class="nav-btn" data-view="journal">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Journal</span>
+                </button>
+                <button class="nav-btn" data-view="calendar">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text">Calendar</span>
+                </button>
+                <button class="nav-btn" data-view="screenshots">
+                    <span class="nav-icon">📸</span>
+                    <span class="nav-text">Screenshots</span>
+                </button>
+                <button class="nav-btn" data-view="analytics">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Analytics</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="stats-mini">
+                    <div class="stat-row">
+                        <span>Trades:</span>
+                        <span id="total-trades">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Win Rate:</span>
+                        <span id="win-rate-display">0%</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>P&L:</span>
+                        <span id="total-pnl-mini">$0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <section id="dashboard-view" class="view active">
+                <h1 class="page-title">Dashboard</h1>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3>Total P&L</h3>
+                            <p class="stat-value" id="total-pnl">$0.00</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <h3>Win Rate</h3>
+                            <p class="stat-value" id="win-rate-stat">0%</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚖️</div>
+                        <div class="stat-info">
+                            <h3>Profit Factor</h3>
+                            <p class="stat-value" id="profit-factor">0.00</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <h3>Avg Trade</h3>
+                            <p class="stat-value" id="avg-trade">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <h3>Win Rate Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="winRateChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="recent-trades-section">
+                    <h3>Recent Trades</h3>
+                    <div id="recent-trades-list" class="recent-trades-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Journal View -->
+            <section id="journal-view" class="view">
+                <h1 class="page-title">Trading Journal</h1>
+                
+                <div class="journal-container">
+                    <div class="entry-form-container">
+                        <button class="toggle-form-btn" id="toggleFormBtn">
+                            <span>+ New Trade Entry</span>
+                        </button>
+                        
+                        <form id="trade-form" class="trade-form">
+                            <div class="form-header">
+                                <h3>New Trade</h3>
+                                <button type="button" class="close-form" id="closeForm">×</button>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Date *</label>
+                                    <input type="date" id="trade-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Symbol *</label>
+                                    <input type="text" id="trade-symbol" placeholder="XAUUSD" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Direction</label>
+                                    <select id="trade-direction">
+                                        <option value="long">Long</option>
+                                        <option value="short">Short</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Result *</label>
+                                    <select id="trade-result" required>
+                                        <option value="win">Win</option>
+                                        <option value="loss">Loss</option>
+                                        <option value="breakeven">Breakeven</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Entry Price *</label>
+                                    <input type="number" id="entry-price" step="0.00001" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Exit Price *</label>
+                                    <input type="number" id="exit-price" step="0.00001" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>P&L ($) *</label>
+                                    <input type="number" id="trade-pnl" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Risk:Reward</label>
+                                    <input type="text" id="trade-rr" placeholder="1:2">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label>Strategy/Setup</label>
+                                <input type="text" id="trade-strategy" placeholder="e.g., Breakout, Support Bounce">
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label>Trade Notes</label>
+                                <textarea id="trade-notes" rows="3" placeholder="Market conditions, emotions, observations..."></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label>Lessons Learned</label>
+                                <textarea id="trade-lessons" rows="2" placeholder="What to improve next time..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn-primary">Save Trade Entry</button>
+                        </form>
+                    </div>
+
+                    <div class="entries-section">
+                        <div class="entries-header">
+                            <h3>Trade History</h3>
+                            <div class="entries-filter">
+                                <select id="filter-symbol">
+                                    <option value="">All Symbols</option>
+                                </select>
+                                <select id="filter-result">
+                                    <option value="">All Results</option>
+                                    <option value="win">Wins</option>
+                                    <option value="loss">Losses</option>
+                                    <option value="breakeven">Breakeven</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="entries-container" class="entries-container">
+                            <!-- Entries populated here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar View -->
+            <section id="calendar-view" class="view">
+                <h1 class="page-title">Trading Calendar</h1>
+                
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button id="prev-month" class="btn-nav">←</button>
+                        <h2 id="current-month-year"></h2>
+                        <button id="next-month" class="btn-nav">→</button>
+                    </div>
+                    
+                    <div class="calendar-weekdays">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendar-grid"></div>
+                    
+                    <div class="calendar-legend">
+                        <span class="legend-item"><span class="dot win"></span> Win</span>
+                        <span class="legend-item"><span class="dot loss"></span> Loss</span>
+                        <span class="legend-item"><span class="dot breakeven"></span> Breakeven</span>
+                    </div>
+                </div>
+
+                <!-- Day Detail Modal -->
+                <div id="day-modal" class="day-modal">
+                    <div class="day-modal-content">
+                        <div class="day-modal-header">
+                            <h3 id="day-modal-title">Trades</h3>
+                            <button class="close-day-modal">×</button>
+                        </div>
+                        <div id="day-trades-list" class="day-trades-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screenshots View -->
+            <section id="screenshots-view" class="view">
+                <h1 class="page-title">Screenshots Library</h1>
+                
+                <div class="screenshots-controls">
+                    <div class="folder-creator">
+                        <input type="text" id="new-folder-name" placeholder="Folder name (e.g., XAUUSD)">
+                        <button id="create-folder" class="btn-secondary">Create</button>
+                    </div>
+                    
+                    <div class="upload-controls" id="uploadControls" style="display: none;">
+                        <select id="folder-select">
+                            <option value="">Select folder...</option>
+                        </select>
+                        <label class="file-upload-btn">
+                            <input type="file" id="screenshot-upload" accept="image/*" multiple capture="environment">
+                            <span>📷 Upload</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="folders-container" id="folders-container">
+                    <!-- Folders populated here -->
+                </div>
+
+                <!-- Image Viewer Modal -->
+                <div id="image-modal" class="image-modal">
+                    <button class="image-modal-close">×</button>
+                    <img id="modal-image" src="" alt="Screenshot">
+                </div>
+            </section>
+
+            <!-- Analytics View -->
+            <section id="analytics-view" class="view">
+                <h1 class="page-title">Analytics</h1>
+                
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Monthly Performance</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Performance by Symbol</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="symbolChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3>Strategy Performance</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="strategyChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card full-width">
+                        <h3>Equity Curve</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="equityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Trade Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Trade</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Symbol</label>
+                        <input type="text" id="edit-symbol" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Result</label>
+                        <select id="edit-result">
+                            <option value="win">Win</option>
+                            <option value="loss">Loss</option>
+                            <option value="breakeven">Breakeven</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>P&L ($)</label>
+                        <input type="number" id="edit-pnl" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Strategy</label>
+                        <input type="text" id="edit-strategy">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="edit-notes" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-danger" id="delete-trade-btn">Delete</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
