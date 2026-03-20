@@ -20,11 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderScreenshots();
     updateStorageInfo();
 
-    // Set today's date in entry form
     document.getElementById('entry-date').valueAsDate = new Date();
 });
 
-// Data Persistence
 function saveData() {
     localStorage.setItem('tradeJournalData', JSON.stringify(data));
     updateStorageInfo();
@@ -38,7 +36,6 @@ function loadData() {
     }
 }
 
-// Navigation
 function showSection(section) {
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
     document.getElementById(section + '-section').classList.remove('hidden');
@@ -48,6 +45,7 @@ function showSection(section) {
     if (section === 'analytics') {
         setTimeout(renderCharts, 100);
     }
+    window.scrollTo(0, 0);
 }
 
 // Calendar Functions
@@ -56,7 +54,7 @@ function renderCalendar() {
     const month = currentDate.getMonth();
 
     document.getElementById('current-month-year').textContent =
-        new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        new Date(year, month).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -65,21 +63,18 @@ function renderCalendar() {
     const grid = document.getElementById('calendar-grid');
     grid.innerHTML = '';
 
-    // Previous month days
     for (let i = firstDay - 1; i >= 0; i--) {
         const day = daysInPrevMonth - i;
         const dayEl = createDayElement(day, true);
         grid.appendChild(dayEl);
     }
 
-    // Current month days
     for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const dayEl = createDayElement(day, false, dateStr);
         grid.appendChild(dayEl);
     }
 
-    // Next month days
     const remainingCells = 42 - (firstDay + daysInMonth);
     for (let day = 1; day <= remainingCells; day++) {
         const dayEl = createDayElement(day, true);
@@ -101,7 +96,8 @@ function createDayElement(day, isOtherMonth, dateStr = null) {
         if (dayData.pnl !== 0) {
             const pnlEl = document.createElement('div');
             pnlEl.className = 'day-pnl ' + (dayData.pnl >= 0 ? 'profit' : 'loss');
-            pnlEl.textContent = (dayData.pnl >= 0 ? '+' : '') + dayData.pnl.toFixed(0);
+            const pnlText = (dayData.pnl >= 0 ? '+' : '') + Math.round(dayData.pnl);
+            pnlEl.textContent = pnlText.length > 6 ? pnlText.substring(0, 6) + '..' : pnlText;
             div.appendChild(pnlEl);
         }
 
@@ -125,7 +121,6 @@ function createDayElement(day, isOtherMonth, dateStr = null) {
 function getDayData(dateStr) {
     const entries = data.entries.filter(e => e.date === dateStr);
     const screenshots = data.screenshots.filter(s => s.date === dateStr);
-
     const pnl = entries.reduce((sum, e) => sum + (parseFloat(e.pnl) || 0), 0);
 
     return {
@@ -146,11 +141,12 @@ function showDayEntries(dateStr) {
     list.innerHTML = '';
 
     if (entries.length === 0) {
-        list.innerHTML = '<p style="color: var(--text-muted);">No entries for this day.</p>';
+        list.innerHTML = '<p style="color: var(--text-muted); padding: 1rem 0;">No entries for this day.</p>';
     } else {
         entries.forEach(entry => {
             const div = document.createElement('div');
-            div.className = 'journal-entry-item animate-in';
+            div.className = 'journal-entry-item';
+            div.style.marginBottom = '0.75rem';
             div.innerHTML = `
                         <div class="entry-date">${entry.date}</div>
                         <div class="entry-title">${entry.title}</div>
@@ -158,8 +154,8 @@ function showDayEntries(dateStr) {
                             ${entry.pnl >= 0 ? '+' : ''}$${entry.pnl}
                         </div>
                         <div style="margin-top: 0.5rem;">
-                            <button class="btn btn-primary" onclick="editEntry('${entry.id}'); closeModal('entry-modal'); showSection('journal');" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
-                                Edit
+                            <button class="btn btn-primary" onclick="editEntry('${entry.id}'); closeModal('entry-modal'); document.querySelector('[onclick=\\'showSection(\\'journal\\')\\']').click();" style="padding: 0.5rem; font-size: 0.875rem; width: auto;">
+                                Edit Entry
                             </button>
                         </div>
                     `;
@@ -207,7 +203,6 @@ function saveEntry() {
     updateStats();
     clearForm();
 
-    // Auto-create folder for instrument if new
     if (entry.instrument && !data.folders.includes(entry.instrument)) {
         data.folders.push(entry.instrument);
         renderFolders();
@@ -226,9 +221,12 @@ function editEntry(id) {
     document.getElementById('entry-pnl').value = entry.pnl;
     document.getElementById('entry-content').value = entry.content;
     document.getElementById('entry-tags').value = entry.tags.join(', ');
-    document.getElementById('delete-entry-btn').style.display = 'inline-flex';
+
+    const deleteBtn = document.getElementById('delete-entry-btn');
+    deleteBtn.classList.remove('hidden');
 
     updateLinkedScreenshots(entry.instrument);
+    window.scrollTo(0, 0);
 }
 
 function deleteCurrentEntry() {
@@ -247,7 +245,7 @@ function clearForm() {
     currentEntryId = null;
     document.getElementById('entry-form').reset();
     document.getElementById('entry-date').valueAsDate = new Date();
-    document.getElementById('delete-entry-btn').style.display = 'none';
+    document.getElementById('delete-entry-btn').classList.add('hidden');
     document.getElementById('linked-screenshots').innerHTML = '';
 }
 
@@ -293,7 +291,7 @@ function updateLinkedScreenshots(instrument) {
     linked.forEach(ss => {
         const tag = document.createElement('span');
         tag.className = 'tag';
-        tag.innerHTML = `<i class="fas fa-image"></i> ${ss.name}`;
+        tag.innerHTML = `<i class="fas fa-image"></i> ${ss.name.substring(0, 15)}${ss.name.length > 15 ? '..' : ''}`;
         container.appendChild(tag);
     });
 }
@@ -301,7 +299,6 @@ function updateLinkedScreenshots(instrument) {
 // Screenshots Functions
 function renderFolders() {
     const container = document.getElementById('folder-tabs');
-    // Keep All tab and New Folder button
     const staticTabs = Array.from(container.children).slice(0, 2);
     container.innerHTML = '';
     staticTabs.forEach(t => container.appendChild(t));
@@ -364,14 +361,17 @@ function renderScreenshots() {
 
     filtered.forEach(ss => {
         const div = document.createElement('div');
-        div.className = 'screenshot-item animate-in';
+        div.className = 'screenshot-item';
         div.innerHTML = `
-                    <img src="${ss.data}" alt="${ss.name}">
-                    <div class="screenshot-overlay">
-                        <button class="btn btn-primary" onclick="viewScreenshot('${ss.id}')"><i class="fas fa-eye"></i></button>
+                    <img src="${ss.data}" alt="${ss.name}" loading="lazy">
+                    <div class="screenshot-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;" onclick="viewScreenshot('${ss.id}')">
+                        <i class="fas fa-eye" style="color: white; font-size: 1.5rem;"></i>
                     </div>
                     ${ss.folder ? '<div class="linked-badge"><i class="fas fa-link"></i></div>' : ''}
                 `;
+        div.querySelector('.screenshot-overlay').style.opacity = '0';
+        div.onmouseenter = () => div.querySelector('.screenshot-overlay').style.opacity = '1';
+        div.onmouseleave = () => div.querySelector('.screenshot-overlay').style.opacity = '0';
         grid.appendChild(div);
     });
 }
@@ -382,7 +382,7 @@ function viewScreenshot(id) {
 
     currentScreenshotId = id;
     document.getElementById('preview-image').src = ss.data;
-    document.getElementById('image-modal-title').textContent = ss.name + ' (' + ss.folder + ')';
+    document.getElementById('image-modal-title').textContent = ss.name;
     document.getElementById('image-modal').classList.add('active');
 }
 
@@ -403,20 +403,22 @@ function updateStats() {
     const wins = entries.filter(e => e.pnl > 0).length;
     const totalPnl = entries.reduce((sum, e) => sum + e.pnl, 0);
     const avgTrade = total > 0 ? totalPnl / total : 0;
-    const best = entries.length > 0 ? Math.max(...entries.map(e => e.pnl)) : 0;
-    const worst = entries.length > 0 ? Math.min(...entries.map(e => e.pnl)) : 0;
+    const best = entries.length > 0 ? Math.max(...entries.map(e => e.pnl), 0) : 0;
+    const worst = entries.length > 0 ? Math.min(...entries.map(e => e.pnl), 0) : 0;
 
     document.getElementById('total-trades').textContent = total;
     document.getElementById('win-rate').textContent = total > 0 ? ((wins / total) * 100).toFixed(1) + '%' : '0%';
-    document.getElementById('total-pnl').textContent = (totalPnl >= 0 ? '+' : '') + '$' + totalPnl.toFixed(2);
-    document.getElementById('total-pnl').className = 'stat-value ' + (totalPnl >= 0 ? 'profit' : 'loss');
-    document.getElementById('avg-trade').textContent = (avgTrade >= 0 ? '+' : '') + '$' + avgTrade.toFixed(2);
-    document.getElementById('best-trade').textContent = '+$' + best.toFixed(2);
-    document.getElementById('worst-trade').textContent = '$' + worst.toFixed(2);
+
+    const pnlEl = document.getElementById('total-pnl');
+    pnlEl.textContent = (totalPnl >= 0 ? '+' : '') + '$' + totalPnl.toFixed(0);
+    pnlEl.className = 'stat-value ' + (totalPnl >= 0 ? 'profit' : 'loss');
+
+    document.getElementById('avg-trade').textContent = (avgTrade >= 0 ? '+' : '') + '$' + avgTrade.toFixed(0);
+    document.getElementById('best-trade').textContent = '+$' + best.toFixed(0);
+    document.getElementById('worst-trade').textContent = '$' + worst.toFixed(0);
 }
 
 function renderCharts() {
-    // Win Rate by Instrument
     const instruments = {};
     data.entries.forEach(e => {
         const inst = e.instrument || 'Unknown';
@@ -440,13 +442,15 @@ function renderCharts() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, max: 100 }
+                y: { beginAtZero: true, max: 100, ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
             }
         }
     });
 
-    // P&L Over Time
     const dateMap = {};
     data.entries.forEach(e => {
         if (!dateMap[e.date]) dateMap[e.date] = 0;
@@ -476,14 +480,15 @@ function renderCharts() {
         },
         options: {
             responsive: true,
-            interaction: {
-                intersect: false,
-                mode: 'index'
+            maintainAspectRatio: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                x: { ticks: { color: '#94a3b8', maxTicksLimit: 6 }, grid: { display: false } }
             }
         }
     });
 
-    // Trade Distribution
     const wins = data.entries.filter(e => e.pnl > 0).length;
     const losses = data.entries.filter(e => e.pnl < 0).length;
     const breakeven = data.entries.filter(e => e.pnl === 0).length;
@@ -499,15 +504,19 @@ function renderCharts() {
                     'rgba(16, 185, 129, 0.8)',
                     'rgba(239, 68, 68, 0.8)',
                     'rgba(245, 158, 11, 0.8)'
-                ]
+                ],
+                borderWidth: 0
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20 } }
+            }
         }
     });
 
-    // Monthly Performance
     const monthly = {};
     data.entries.forEach(e => {
         const month = e.date.substring(0, 7);
@@ -529,7 +538,13 @@ function renderCharts() {
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                x: { ticks: { color: '#94a3b8', maxTicksLimit: 6 }, grid: { display: false } }
+            }
         }
     });
 }
@@ -605,17 +620,14 @@ function clearAllData() {
 function updateStorageInfo() {
     const bytes = new Blob([JSON.stringify(data)]).size;
     const kb = (bytes / 1024).toFixed(2);
-    const mb = (bytes / (1024 * 1024)).toFixed(2);
     document.getElementById('storage-info').textContent =
-        `Using ${kb} KB (${mb} MB) of local storage • ${data.entries.length} entries • ${data.screenshots.length} screenshots`;
+        `Using ${kb} KB • ${data.entries.length} entries • ${data.screenshots.length} screenshots`;
 }
 
-// Utilities
 function closeModal(id) {
     document.getElementById(id).classList.remove('active');
 }
 
-// Close modals on outside click
 window.onclick = (e) => {
     if (e.target.classList.contains('modal')) {
         e.target.classList.remove('active');
