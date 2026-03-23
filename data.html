@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeFusio | Data Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="data.css">
+</head>
+<body>
+    <header class="mobile-header">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="logo-text">MF|TradeFusio</div>
+        <div style="width: 40px;"></div>
+    </header>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <div class="logo-text">TradeJournal</div>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-btn">
+                    <span class="nav-icon">📈</span><span>Dashboard</span>
+                </a>
+                <a href="journal.html" class="nav-btn">
+                    <span class="nav-icon">📝</span><span>Journal</span>
+                </a>
+                <a href="calendar.html" class="nav-btn">
+                    <span class="nav-icon">📅</span><span>Calendar</span>
+                </a>
+                <a href="screenshots.html" class="nav-btn">
+                    <span class="nav-icon">📸</span><span>Screenshots</span>
+                </a>
+                <a href="analytics.html" class="nav-btn">
+                    <span class="nav-icon">📊</span><span>Analytics</span>
+                </a>
+                <a href="data.html" class="nav-btn active">
+                    <span class="nav-icon">💾</span><span>Data</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="mini-stats">
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Total Trades</span>
+                        <span class="mini-stat-value" id="mini-total">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Win Rate</span>
+                        <span class="mini-stat-value" id="mini-winrate">0%</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">P&L</span>
+                        <span class="mini-stat-value" id="mini-pnl">$0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Data Management</h1>
+                <p class="page-subtitle">Export, import, and backup your trading data</p>
+            </div>
+
+            <div class="data-grid">
+                <!-- Export Data -->
+                <div class="data-card">
+                    <h3 class="card-title">📥 Export Data</h3>
+                    <p class="card-description">Download all your trades, screenshots, and folders as a JSON file for backup or transfer.</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="export-trades">0</div>
+                            <div class="stat-label">Trades</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="export-folders">0</div>
+                            <div class="stat-label">Folders</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="export-screenshots">0</div>
+                            <div class="stat-label">Screenshots</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-full" onclick="exportData()">
+                        <span>💾</span> Download Backup File
+                    </button>
+                </div>
+
+                <!-- Import Data -->
+                <div class="data-card">
+                    <h3 class="card-title">📤 Import Data</h3>
+                    <p class="card-description">Restore your data from a previously exported backup file.</p>
+
+                    <div class="file-input-wrapper">
+                        <input type="file" id="importFile" accept=".json" onchange="previewImport(this)">
+                        <label for="importFile" class="file-input-label">
+                            <span>📁</span> Choose backup file...
+                        </label>
+                    </div>
+
+                    <div id="importPreview" style="display: none;">
+                        <div class="data-preview" id="previewContent"></div>
+                        <div class="import-actions">
+                            <button class="btn btn-success btn-full" onclick="importData()">
+                                <span>✓</span> Import Data
+                            </button>
+                            <button class="btn btn-danger" onclick="cancelImport()">
+                                <span>✕</span> Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clear Data -->
+                <div class="data-card" style="grid-column: 1 / -1;">
+                    <h3 class="card-title" style="color: var(--loss);">🗑️ Clear All Data</h3>
+                    <p class="card-description">Permanently delete all trades, screenshots, and folders. This action cannot be undone.</p>
+                    
+                    <div class="warning-box">
+                        <div class="warning-box-icon">⚠️</div>
+                        <div class="warning-box-content">
+                            <div class="warning-box-title">Warning: Destructive Action</div>
+                            <div class="warning-box-text">Make sure to export your data before clearing. Once deleted, your data cannot be recovered.</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-danger btn-full" onclick="clearAllData()">
+                        <span>🗑️</span> Clear All Data
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="data.js"></script>
+</body>
+</html>

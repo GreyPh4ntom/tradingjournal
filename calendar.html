@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeFusio | Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="calendar.css">
+
+</head>
+<body>
+    <header class="mobile-header">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="logo-text">MF|TradeFusiol</div>
+        <div style="width: 40px;"></div>
+    </header>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <div class="logo-text">TradeJournal</div>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-btn">
+                    <span class="nav-icon">📈</span><span>Dashboard</span>
+                </a>
+                <a href="journal.html" class="nav-btn">
+                    <span class="nav-icon">📝</span><span>Journal</span>
+                </a>
+                <a href="calendar.html" class="nav-btn active">
+                    <span class="nav-icon">📅</span><span>Calendar</span>
+                </a>
+                <a href="screenshots.html" class="nav-btn">
+                    <span class="nav-icon">📸</span><span>Screenshots</span>
+                </a>
+                <a href="analytics.html" class="nav-btn">
+                    <span class="nav-icon">📊</span><span>Analytics</span>
+                </a>
+                <a href="data.html" class="nav-btn active">
+                    <span class="nav-icon">💾</span><span>Data</span>
+                </a> 
+            </nav>
+            <div class="sidebar-footer">
+                <div class="mini-stats">
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Total Trades</span>
+                        <span class="mini-stat-value" id="mini-total">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Win Rate</span>
+                        <span class="mini-stat-value" id="mini-winrate">0%</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">P&L</span>
+                        <span class="mini-stat-value" id="mini-pnl">$0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Calendar</h1>
+                <p class="page-subtitle">Visualize your trading activity</p>
+            </div>
+
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button class="btn" onclick="changeMonth(-1)">←</button>
+                        <h2 class="calendar-title" id="calendarTitle"></h2>
+                        <button class="btn" onclick="changeMonth(1)">→</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="goToToday()">Today</button>
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid"></div>
+
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <span class="trade-dot win"></span><span>Win</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="trade-dot loss"></span><span>Loss</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="trade-dot breakeven"></span><span>Breakeven</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="dayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="dayModalTitle">Trades</h3>
+                <button class="close-modal" onclick="closeDayModal()">×</button>
+            </div>
+            <div class="day-modal-content" id="dayModalContent"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="calendar.js"></script>
+</body>
+</html>

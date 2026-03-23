@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TradeFusio | Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="logo-text">MF|TradeFusio</div>
+        <div style="width: 40px;"></div>
+    </header>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <div class="logo-text">TradeJournal</div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-btn active">
+                    <span class="nav-icon">📈</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="journal.html" class="nav-btn">
+                    <span class="nav-icon">📝</span>
+                    <span>Journal</span>
+                </a>
+                <a href="calendar.html" class="nav-btn">
+                    <span class="nav-icon">📅</span>
+                    <span>Calendar</span>
+                </a>
+                <a href="screenshots.html" class="nav-btn">
+                    <span class="nav-icon">📸</span>
+                    <span>Screenshots</span>
+                </a>
+                <a href="analytics.html" class="nav-btn">
+                    <span class="nav-icon">📊</span>
+                    <span>Analytics</span>
+                </a>
+                <a href="data.html" class="nav-btn active">
+                    <span class="nav-icon">💾</span><span>Data</span>
+                </a>                
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="mini-stats">
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Total Trades</span>
+                        <span class="mini-stat-value" id="mini-total">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Win Rate</span>
+                        <span class="mini-stat-value" id="mini-winrate">0%</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">P&L</span>
+                        <span class="mini-stat-value" id="mini-pnl">$0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Overview of your trading performance</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="journal.html" class="btn btn-primary">
+                    <span>+</span> New Trade
+                </a>
+                <a href="screenshots.html" class="btn btn-secondary">
+                    <span>📷</span> Add Screenshot
+                </a>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Total P&L</span>
+                        <div class="stat-icon">💰</div>
+                    </div>
+                    <div class="stat-value" id="total-pnl">$0.00</div>
+                    <div class="stat-change">All time profit/loss</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Win Rate</span>
+                        <div class="stat-icon">🎯</div>
+                    </div>
+                    <div class="stat-value" id="win-rate">0%</div>
+                    <div class="stat-change">
+                        <span id="win-count">0 wins</span> / <span id="loss-count">0 losses</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Profit Factor</span>
+                        <div class="stat-icon">⚖️</div>
+                    </div>
+                    <div class="stat-value" id="profit-factor">0.00</div>
+                    <div class="stat-change">Gross profit / loss ratio</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Avg Trade</span>
+                        <div class="stat-icon">📊</div>
+                    </div>
+                    <div class="stat-value" id="avg-trade">$0.00</div>
+                    <div class="stat-change">Per trade average</div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Main Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Equity Curve</h3>
+                        <a href="analytics.html" class="btn btn-secondary btn-sm">View All</a>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="equityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Trades -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Trades</h3>
+                        <a href="journal.html" class="btn btn-secondary btn-sm">View All</a>
+                    </div>
+                    <div class="recent-trades-list" id="recent-trades">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Win Rate Distribution -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3 class="card-title">Performance Distribution</h3>
+                </div>
+                <div class="chart-container" style="height: 250px;">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="home.js"></script>
+</body>
+</html>

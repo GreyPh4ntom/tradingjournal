@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeFusio | Journal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="journal.css">
+
+</head>
+<body>
+    <header class="mobile-header">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="logo-text">MF|TradeFusio</div>
+        <div style="width: 40px;"></div>
+    </header>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">📊</div>
+                    <div class="logo-text">TradeJournal</div>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-btn">
+                    <span class="nav-icon">📈</span><span>Dashboard</span>
+                </a>
+                <a href="journal.html" class="nav-btn active">
+                    <span class="nav-icon">📝</span><span>Journal</span>
+                </a>
+                <a href="calendar.html" class="nav-btn">
+                    <span class="nav-icon">📅</span><span>Calendar</span>
+                </a>
+                <a href="screenshots.html" class="nav-btn">
+                    <span class="nav-icon">📸</span><span>Screenshots</span>
+                </a>
+                <a href="analytics.html" class="nav-btn">
+                    <span class="nav-icon">📊</span><span>Analytics</span>
+                </a>
+                <a href="data.html" class="nav-btn active">
+                    <span class="nav-icon">💾</span><span>Data</span>
+                </a> 
+            </nav>
+            <div class="sidebar-footer">
+                <div class="mini-stats">
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Total Trades</span>
+                        <span class="mini-stat-value" id="mini-total">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">Win Rate</span>
+                        <span class="mini-stat-value" id="mini-winrate">0%</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">P&L</span>
+                        <span class="mini-stat-value" id="mini-pnl">$0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Journal</h1>
+                <p class="page-subtitle">Record and review your trades</p>
+            </div>
+
+            <div class="journal-layout">
+                <!-- Entry Form -->
+                <form class="entry-form" id="tradeForm">
+                    <h3 style="margin-bottom: 20px; font-family: 'Playfair Display', serif;">New Trade Entry</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Date *</label>
+                            <input type="date" class="form-input" id="trade-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Symbol *</label>
+                            <input type="text" class="form-input" id="trade-symbol" placeholder="XAUUSD" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Direction</label>
+                            <select class="form-select" id="trade-direction">
+                                <option value="long">Long</option>
+                                <option value="short">Short</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Result *</label>
+                            <select class="form-select" id="trade-result" required>
+                                <option value="win">Win</option>
+                                <option value="loss">Loss</option>
+                                <option value="breakeven">Breakeven</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Entry Price *</label>
+                            <input type="number" class="form-input" id="entry-price" step="0.00001" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Exit Price *</label>
+                            <input type="number" class="form-input" id="exit-price" step="0.00001" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">P&L ($) *</label>
+                            <input type="number" class="form-input" id="trade-pnl" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">R:R Ratio</label>
+                            <input type="text" class="form-input" id="trade-rr" placeholder="1:2">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Strategy</label>
+                            <input type="text" class="form-input" id="trade-strategy" placeholder="e.g., Breakout, Support Bounce">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Trade Notes</label>
+                            <textarea class="form-textarea" id="trade-notes" placeholder="Market conditions, emotions, observations..."></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Lessons Learned</label>
+                            <textarea class="form-textarea" id="trade-lessons" placeholder="What to improve next time..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+                        Save Trade Entry
+                    </button>
+                </form>
+
+                <!-- Entries List -->
+                <div>
+                    <div class="filters-bar">
+                        <select class="form-select" id="filter-symbol" style="width: auto; min-width: 150px;">
+                            <option value="">All Symbols</option>
+                        </select>
+                        <select class="form-select" id="filter-result" style="width: auto; min-width: 150px;">
+                            <option value="">All Results</option>
+                            <option value="win">Wins</option>
+                            <option value="loss">Losses</option>
+                            <option value="breakeven">Breakeven</option>
+                        </select>
+                    </div>
+
+                    <div class="entries-list" id="entriesList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Trade</h3>
+                <button class="close-modal" onclick="closeEditModal()">×</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="edit-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Symbol</label>
+                        <input type="text" class="form-input" id="edit-symbol" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Result</label>
+                        <select class="form-select" id="edit-result">
+                            <option value="win">Win</option>
+                            <option value="loss">Loss</option>
+                            <option value="breakeven">Breakeven</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">P&L ($)</label>
+                        <input type="number" class="form-input" id="edit-pnl" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Strategy</label>
+                        <input type="text" class="form-input" id="edit-strategy">
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-textarea" id="edit-notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-danger" onclick="deleteCurrentTrade()">Delete</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="journal.js"></script>
+</body>
+</html>
